@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/personal_blog?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+    username: root
+    password: 123456
+
+  jpa:
+    database: mysql
+    show-sql: true # 显示sql到控制台
+    hibernate:
+      ddl-auto: update # 数据库没有表示自动构建
+    generate-ddl: true # 自动生成
+    database-platform: org.hibernate.dialect.MySQL8Dialect # 数据库方言 DataBbase枚举内获取
+  devtools:
+    restart:
+      enabled: true # 热部署生效
+      additional-paths: src/main/java # 设置重启目录
+      exclude: templates/** # 不重启目录
+
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
+
+pagehelper:
+  helper-dialect: mysql
+
+

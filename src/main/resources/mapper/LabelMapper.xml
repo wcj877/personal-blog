@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.personalblog.mapper.LabelMapper">
+    <select id="findAllLabel" resultType="com.example.personalblog.vo.DisplayLabel">
+        select label.lid as id,label_name as name, count(article_label.lid) as countNum
+        from label left join article_label
+        on article_label.lid=label.lid
+        where label_name like concat('%',#{str},'%')
+        group by label.lid
+    </select>
+
+
+
+</mapper>

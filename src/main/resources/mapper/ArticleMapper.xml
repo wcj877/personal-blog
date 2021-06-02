@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.personalblog.mapper.ArticleMapper">
+    <select id="findAllArticle" resultMap="disArticle">
+        select article.aid,headine,update_time,create_time,watch_number,content,
+        cover_photo, state,al.lid,label.label_name
+        ,article.clid,class_name
+        from article
+        left join article_label al on article.aid = al.aid
+        left join classify on article.clid=classify.clid
+        left join label on label.lid = al.lid
+        where headine like concat('%',#{str},'%')
+    </select>
+
+    <select id="findArticle" resultMap="disArticle">
+        select article.aid,headine,update_time,create_time,watch_number,content,
+        cover_photo, state,al.lid,label.label_name, uid
+        ,article.clid,class_name
+        from article
+        left join article_label al on article.aid = al.aid
+        left join classify on article.clid=classify.clid
+        left join label on label.lid = al.lid
+        where article.aid=#{id}
+    </select>
+
+    <select id="findHottest" resultMap="disArticle">
+        select article.aid,headine,create_time,watch_number,
+        cover_photo,al.lid,label.label_name, uid
+        ,article.clid,class_name
+        from article
+        left join article_label al on article.aid = al.aid
+        left join classify on article.clid=classify.clid
+        left join label on label.lid = al.lid
+        Order by article.watch_number DESC
+    </select>
+
+    <select id="findLatest" resultMap="disArticle">
+        select article.aid,headine,create_time,watch_number,
+        cover_photo,al.lid,label.label_name, uid
+        ,article.clid,class_name
+        from article
+        left join article_label al on article.aid = al.aid
+        left join classify on article.clid=classify.clid
+        left join label on label.lid = al.lid
+        Order by article.create_time DESC
+    </select>
+
+    <resultMap id="disArticle" type="com.example.personalblog.vo.DisplayArticle">
+        <id property="id" column="aid"/>
+        <result property="headine" column="headine"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="watchNumber" column="watch_number"/>
+        <result property="content" column="content"/>
+        <result property="state" column="state"/>
+        <result property="coverPhoto" column="cover_photo"/>
+        <association property="classify" javaType="com.example.personalblog.entity.Classify" resultMap="ClassifyResultMap"/>
+        <collection property="label" ofType="com.example.personalblog.entity.Label" resultMap="LabelResultMap"/>
+    </resultMap>
+
+    <resultMap id="LabelResultMap" type="com.example.personalblog.entity.Label">
+        <id property="lid" column="lid"/>
+        <result property="labelName" column="label_name"/>
+    </resultMap>
+
+    <resultMap id="ClassifyResultMap" type="com.example.personalblog.entity.Classify">
+        <id property="clid" column="clid"/>
+        <result property="className" column="class_name"/>
+    </resultMap>
+
+</mapper>

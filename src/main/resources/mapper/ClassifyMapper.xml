@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.personalblog.mapper.ClassifyMapper">
+
+    <select id="findAllClassify" resultType="com.example.personalblog.vo.DisplayClassify">
+        select classify.clid as id,class_name as name, count(article.aid) as countNumber
+        from classify left join article
+        on article.clid=classify.clid
+        where class_name like concat('%',#{str},'%')
+        group by classify.clid
+    </select>
+
+</mapper>

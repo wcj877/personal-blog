@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>欢迎页面-X-admin2.2</title>
+        <meta name="renderer" content="webkit">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+        <link rel="stylesheet" th:href="@{/css/font.css}">
+        <link rel="stylesheet" th:href="@{/css/xadmin.css}">
+        <script th:src="@{/lib/layui/layui.js}" charset="utf-8"></script>
+        <script type="text/javascript" th:src="@{/js/xadmin.js}"></script>
+        <!--[if lt IE 9]>
+          <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+          <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+    </head>
+    <body>
+        <div class="x-nav">
+          <span class="layui-breadcrumb">
+            <a href="">首页</a>
+            <a href="">演示</a>
+            <a>
+              <cite>导航元素</cite></a>
+          </span>
+          <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right" onclick="location.reload()" title="刷新">
+            <i class="layui-icon layui-icon-refresh" style="line-height:30px"></i></a>
+        </div>
+        <div class="layui-fluid">
+            <div class="layui-row layui-col-space15">
+                <div class="layui-col-md12">
+                    <div class="layui-card">
+                        <div class="layui-card-body ">
+                            <form class="layui-form layui-col-space5" action="/admin/article/list" method="post">
+                                <div class="layui-inline layui-show-xs-block" action="/admin/user/inquire">
+                                    <input type="text" th:value="${str}" name="str"  placeholder="请输入标题" autocomplete="off" class="layui-input">
+                                </div>
+                                <div class="layui-inline layui-show-xs-block">
+                                    <button class="layui-btn"  lay-submit="" lay-filter="sreach"><i class="layui-icon">&#xe615;</i></button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="layui-card-header">
+                            <button class="layui-btn" onclick="addArticle()"><i class="layui-icon"></i>添加</button>
+
+                        </div>
+                        <div class="layui-card-body layui-table-body layui-table-main">
+                            <table class="layui-table layui-form">
+                                <thead>
+                                  <tr>
+                                      <th>封面照片</th>
+                                      <th>ID</th>
+                                      <th>标题</th>
+                                      <th>分类</th>
+                                      <th>浏览数</th>
+                                      <th>创建时间</th>
+                                      <th>最近修改时间</th>
+                                      <th>标签</th>
+                                      <th>状态</th>
+                                      <th>操作</th></tr>
+                                </thead>
+                                <tbody>
+                                  <!--/*@thymesVar id="userList" type="com.example.personalblog.vo.DisplayUser"*/-->
+                                  <tr th:each="article : ${pageInfo.list}">
+                                      <td>
+                                          <img src="/images/404.jpg">
+                                      </td>
+                                    <td class="id" th:text="${article.id}"></td>
+                                    <td th:text="${article.headine}"></td>
+                                    <td th:text="${article.classify.className}"></td>
+                                      <td th:text="${article.watchNumber}">s</td>
+                                    <td th:text="${article.createTime}"></td>
+                                      <td th:text="${article.updateTime}"></td>
+
+                                      <td class="layui-tag">
+                                          <span th:each=" label :${article.label}" th:text="${label.labelName}" class="layui-btn-normal layui-btn-mini"></span>
+                                      </td>
+
+
+                                    <td class="td-status">
+                                      <span th:if="${article.state eq 0}" class="layui-btn layui-btn-normal layui-btn-mini">已发表</span>
+                                      <span th:if="${article.state eq 1}" class="layui-btn layui-btn-disabled layui-btn-normal layui-btn-mini">草稿</span></td>
+                                    <td class="td-manage">
+                                      <a th:if="${article.state eq 0}" onclick="member_stop(this,'发表')" href="javascript:;"  title="已发表">
+                                        <i class="layui-icon">&#xe601;</i>
+                                      </a>
+                                        <a th:if="${article.state eq 1}" onclick="member_stop(this,'草稿')" href="javascript:;"  title="草稿">
+                                            <i class="layui-icon">&#xe601;</i>
+                                        </a>
+                                        <a title="编辑"  onclick="updateArticle(this)" href="javascript:;">
+                                            <i class="layui-icon">&#xe642;</i>
+                                        </a>
+                                        <a title="删除" onclick="member_del(this)" href="javascript:;">
+                                            <i class="layui-icon">&#xe640;</i>
+                                        </a>
+                                    </td>
+                                  </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="layui-card-body ">
+                            <div class="page">
+                                <div>
+                                  <a class="prev" href="">&lt;&lt;</a>
+                                    <a th:each="page : ${#numbers.sequence(1,pageInfo.pages)}" class="num" th:text="${page}"  th:onclick="turnPage([[${page}]])"></a>
+                                  <a class="next" href="">&gt;&gt;</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </body>
+
+    <script th:inline="javascript">
+        //翻页
+        function turnPage(pageNum){
+            var str = [[${str}]];
+            $.post("/admin/article/list",{str:str, pageNum:pageNum});
+        }
+    </script>
+
+
+    <script>
+        //文章添加
+        function addArticle() {
+            xadmin.add_tab('文章添加','/admin/article/add');
+            //刷新当前页面
+            parent.location.reload();
+            console.log("刷新")
+        }
+
+        //文章修改
+        function updateArticle(obj) {
+            var id = $(obj).parents("tr").find(".id").text();
+            xadmin.add_tab("文章修改", '/admin/article/update/'+id);
+            //刷新当前页面
+            parent.location.reload()
+        }
+
+        //删除文章
+        function member_del(obj){
+            layer.confirm('确认要删除吗？',function(index){
+                //发异步删除数据
+                $(obj).parents("tr").remove();
+                var id = $(obj).parents("tr").find(".id").text();
+                $.post("/admin/article/delete",{id:id});
+                layer.msg('已删除!',{icon:1,time:1000});
+            });
+        }
+
+        /*文章-停用*/
+        function member_stop(obj,text){
+            layer.confirm('确认要'+text+'吗？',function(index){
+
+                if($(obj).attr('title')=='已发表'){
+
+                    //发异步把用户状态进行更改
+                    $(obj).attr('title','草稿')
+                    $(obj).find('i').html('&#xe62f;');
+
+                    $(obj).parents("tr").find(".td-status").find('span').addClass('layui-btn-disabled').html('草稿');
+                    layer.msg('草稿!',{icon: 5,time:1000});
+                    var id = $(obj).parents("tr").find(".id").text();
+
+                    $.post("/admin/article/updateState",{state:"1", id:id});
+
+                }else{
+                    $(obj).attr('title','已发表');
+                    $(obj).find('i').html('&#xe601;');
+
+                    $(obj).parents("tr").find(".td-status").find('span').removeClass('layui-btn-disabled').html('已发表');
+                    layer.msg('已发表!',{icon: 5,time:1000});
+                    var id = $(obj).parents("tr").find(".id").text();
+                    $.post("/admin/article/updateState",{state:"0", id:id});
+                }
+
+            });
+        }
+    </script>
+</html>

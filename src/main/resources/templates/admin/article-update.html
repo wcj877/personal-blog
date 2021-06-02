@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html class="x-admin-sm">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面-X-admin2.2</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui/css/layui.css" />
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="http://cdn.bootcss.com/highlight.js/8.0/styles/monokai_sublime.min.css" rel="stylesheet">
+    <!-- 引入css文件 -->
+    <link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet"
+          href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.7.2/styles/default.min.css">
+
+
+    <style>
+        /*编辑器样式修改*/
+        .ql-snow .ql-picker.ql-size .ql-picker-label::before {
+            content: '中字体';
+        }
+        .ql-toolbar.ql-snow .ql-formats {
+            margin-right: 8px;
+        }
+
+        #editor{min-height:300px;
+            height: 400px;}
+        .layui-upload-img{
+            height: 100px;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+<!-- 创建工具栏组件 -->
+<div id="toolbar">
+            <span class="ql-formats">
+              <button class="ql-bold">Bold</button><!--控制粗细-->
+              <button class="ql-italic">Italic</button>    <!--控制切斜-->
+              <button class="ql-underline">下划线</button>    <!--下划线-->
+              <button class="ql-link">link</button>    <!--链接-->
+          </span>
+    <span class="ql-formats">
+              <button class="ql-list" value="ordered"></button><!--序号-->
+              <button class="ql-list" value="bullet"></button>    <!--点-->
+              <button class="ql-list" value="ql-blockquote"></button>    <!--引用-->
+              <button class="ql-code-block"></button>    <!--代码-->
+              <button class="ql-image" value="bullet"></button>    <!--图片-->
+          </span>
+    <span class="ql-formats">
+            <select class="ql-color">
+              <option selected></option>
+              <option value="red"></option>
+              <option value="orange"></option>
+              <option value="yellow"></option>
+              <option value="green"></option>
+              <option value="blue"></option>
+              <option value="purple"></option>
+            </select>
+            <select class="ql-background">
+              <option selected></option>
+              <option value="red"></option>
+              <option value="orange"></option>
+              <option value="yellow"></option>
+              <option value="green"></option>
+              <option value="blue"></option>
+              <option value="purple"></option>
+            </select>
+          </span>
+    <span class="ql-formats"><!--控制大小-->
+            <select class="ql-size">
+              <option value="10px">小字体</option>
+              <option selected>中字体</option>
+              <option value="18px">大字体</option>
+              <option value="32px">超大字</option>
+            </select>
+          </span>
+</div>
+
+<!-- 创建文本编辑器 -->
+<div id="editor" th:utext="${article.content}">
+
+</div>
+
+<form class="layui-form" action="/admin/article/save" method="post">
+
+    <input type="hidden" name="aid" th:value="${article.id}"/>
+
+    <input type="hidden"  id="richText" name="content" style="display: none;" value="" />  <!--用于form表单提交-->
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-block">
+            <input type="text" th:value="${article.headine}" name="headine" lay-verify="title" autocomplete="off" placeholder="请输入标题" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">分类</label>
+        <div class="layui-input-block">
+            <select name="clid" lay-verify="classify" >
+                <option value="0"></option>
+                <option th:each="classify :${classifyList}"
+                        th:value="${classify.clid}"
+                        th:text="${classify.className}"
+                        th:selected="${classify.clid eq article.classify.clid}"></option>
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item" pane="">
+        <label class="layui-form-label">标签</label>
+        <div class="layui-input-block">
+            <input th:each="label:${labelList}" type="checkbox" name="label"
+                   th:value="${label.lid}" lay-skin="primary"
+                   th:title="${label.labelName}"
+                   th:checked="${#lists.contains(articleLabel,label.lid)?true:false}">
+
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="state" value="0" title="发表" th:checked="${article.state eq 0}">
+            <input type="radio" name="state" value="1" title="草稿" th:checked="${article.state eq 1}">
+        </div>
+    </div>
+
+    <div class="layui-upload">
+        <button type="button" class="layui-btn" id="test1">上传图片</button>
+        <div class="layui-upload-list">
+            <img class="layui-upload-img" id="demo1" th:src="${article.coverPhoto}">
+            <p id="demoText"></p>
+            <input type="hidden" id="img_url" name="coverPhoto" value=""/>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <div class="layui-input-block">
+            <button type="submit" onclick="buttons()" class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+
+</form>
+
+
+<script src="https://www.layuicdn.com/layui/layui.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.2/dist/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.15.8/highlight.min.js"></script>
+<script src="http://cdn.quilljs.com/1.0.0/quill.js"></script>
+<script>
+
+
+
+
+    layui.use(['upload', 'element', 'layer','form'], function() {
+        var $ = layui.jquery
+            ,form = layui.form
+            , upload = layui.upload
+            , element = layui.element
+            , layer = layui.layer;
+        //常规使用 - 普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1'
+            , url: 'http://localhost:8080/admin/article/img' //改成您自己的上传接口
+            , before: function (obj) {
+                //预读本地文件示例，不支持ie8
+                obj.preview(function (index, file, result) {
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+
+
+            }
+            ,size: 1024
+            , done: function (res) {
+                //如果上传失败
+                if (res.code > 0) {
+                    return layer.msg('上传失败');
+                }
+                //上传成功的一些操作
+                //上传成功的一些操作
+                //上传成功
+                layer.msg('上传成功', {icon: 1});
+                document.getElementById("img_url").value = res.url;
+                $('#demoText').html(''); //置空上传失败的状态
+            }
+            , error: function () {
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function () {
+                    uploadInst.upload();
+                });
+            }
+            //进度条
+            , progress: function (n, index, e) {
+
+                if (n == 100) {
+                    layer.msg('上传完毕', {icon: 1});
+                }
+            }
+        });
+
+        form.verify({
+            title:function(value, item){
+                if (value.length == 0){
+                    return "标题不能为空"
+                }
+            },
+            classify: function(value, item){ //value：表单的值、item：表单的DOM对象
+                if (value == 0){
+                    return "请选择分类"
+                }
+            }
+
+
+        });
+    });
+
+
+    window.onload=function(){
+        var BackgroundClass = Quill.import('attributors/class/background');
+        var ColorClass = Quill.import('attributors/class/color');
+        var SizeStyle = Quill.import('attributors/style/size');
+        Quill.register(BackgroundClass, true);
+        Quill.register(ColorClass, true);
+        Quill.register(SizeStyle, true);
+
+        hljs.configure({   // optionally configure hljs
+            languages: ['javascript', 'ruby', 'python']
+        });
+
+        var editor = new Quill('#editor', {
+            modules: {
+                syntax: true, //设置语法模块
+                toolbar: '#toolbar'
+            },
+            placeholder: 'Compose an epic...',
+            theme: 'snow'
+        });
+
+
+
+    }
+
+    function buttons() {
+        const html = document.querySelector('#editor').children[0].innerHTML;
+        console.log(html)
+        $("#richText").val(html);
+    }
+</script>
+</body>
+
+</html>
